@@ -6,4 +6,7 @@ src/main/webapp/WEB-INF/classes/
 src/main/webapp/WEB-INF/lib/
 .idea
 *.iml
+*.mvn
+mvnw
+mvnw.cmd
 
