@@ -105,9 +105,10 @@ public class HttpClientTool {
 
         //请求重试处理
         httpRequestRetryHandler = (exception, executionCount, context) -> {
-            if (executionCount >= 1) {// 如果已经重试了1次，就放弃
+            if (executionCount >= 5) {// 如果已经重试了1次，就放弃
                 if(isLogger){
-                    logger.info("已经重试了{}次，放弃重试",executionCount);
+                    System.out.println(context);
+                    logger.info("已经重试了{}次，放弃重试",executionCount - 1);
                 }
                 return false;
             }
@@ -197,7 +198,6 @@ public class HttpClientTool {
             response = closeableHttpClient.execute(httpGet);
             System.out.println(response.getStatusLine());
             httpEntity = response.getEntity();
-            httpGet.abort();
             return EntityUtils.toString(httpEntity);
         } catch (IOException e) {
             e.printStackTrace();
@@ -222,19 +222,27 @@ public class HttpClientTool {
      * @return
      */
     public static String post(String url){
-        CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
+        CloseableHttpClient closeableHttpClient = getHttpClient();
         HttpPost httpPost = new HttpPost(url);
         CloseableHttpResponse closeableHttpResponse = null;
+        HttpEntity httpEntity = null;
         try {
             closeableHttpResponse = closeableHttpClient.execute(httpPost);
             System.out.println(closeableHttpResponse.getStatusLine());
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            EntityUtils.consume(httpEntity);
+            httpEntity = closeableHttpResponse.getEntity();
+            return EntityUtils.toString(httpEntity);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                closeableHttpResponse.close();
+                EntityUtils.consume(httpEntity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if(closeableHttpResponse != null){
+                    closeableHttpResponse.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

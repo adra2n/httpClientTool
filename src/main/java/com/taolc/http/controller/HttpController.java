@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/http")
 public class HttpController {
@@ -24,6 +26,11 @@ public class HttpController {
     public ResponseData post(){
         ResponseData responseData = new ResponseData(ResponseEnum.OK);
         responseData.setData("this is post http");
+        try {
+            TimeUnit.SECONDS.sleep(4L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return responseData;
     }
 }
