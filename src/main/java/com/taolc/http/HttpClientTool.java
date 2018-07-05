@@ -37,7 +37,11 @@ import java.util.Arrays;
  * httpClient 连接工具类
  */
 public class HttpClientTool {
+
     private static Logger logger = LoggerFactory.getLogger(HttpClientTool.class);
+
+    private static boolean isLogger = true;
+
     /**
      * 连接池管理
      */
@@ -84,7 +88,7 @@ public class HttpClientTool {
         //连接池最大生成连接数
         poolingHttpClientConnectionManager.setMaxTotal(2);
         //默认设置route最大连接数
-        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(1);
+        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(2);
 
         requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.DEFAULT)
@@ -102,24 +106,45 @@ public class HttpClientTool {
         //请求重试处理
         httpRequestRetryHandler = (exception, executionCount, context) -> {
             if (executionCount >= 1) {// 如果已经重试了1次，就放弃
+                if(isLogger){
+                    logger.info("已经重试了{}次，放弃重试",executionCount);
+                }
                 return false;
             }
             if (exception instanceof NoHttpResponseException) {// 如果服务器丢掉了连接，那么就重试
+                if(isLogger){
+                    logger.info("服务器丢掉了连接，重试请求");
+                }
                 return true;
             }
             if (exception instanceof SSLHandshakeException) {// 不要重试SSL握手异常
+                if(isLogger){
+                    logger.info("SSL握手异常，放弃重试");
+                }
                 return false;
             }
             if (exception instanceof InterruptedIOException) {// 超时
+                if(isLogger){
+                    logger.info("超时异常，放弃重试");
+                }
                 return false;
             }
             if (exception instanceof UnknownHostException) {// 目标服务器不可达
+                if(isLogger){
+                    logger.info("目标服务器不可达，放弃重试");
+                }
                 return false;
             }
             if (exception instanceof ConnectTimeoutException) {// 连接被拒绝
+                if(isLogger){
+                    logger.info("连接被拒绝，放弃重试");
+                }
                 return false;
             }
-            if (exception instanceof SSLException) {// ssl握手异常
+            if (exception instanceof SSLException) {// ssl异常
+                if(isLogger){
+                    logger.info("ssl异常，放弃重试");
+                }
                 return false;
             }
 
@@ -127,6 +152,9 @@ public class HttpClientTool {
             HttpRequest request = clientContext.getRequest();
             // 如果请求是幂等的，就再次尝试
             if (!(request instanceof HttpEntityEnclosingRequest)) {
+                if(isLogger){
+                    logger.info("当前请求是幂等，重试请求");
+                }
                 return true;
             }
             return false;
