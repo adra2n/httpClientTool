@@ -249,4 +249,8 @@ public class HttpClientTool {
         }
         return null;
     }
+
+    public static String postJson(String url,String json){
+        return null;
+    }
 }

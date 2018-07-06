@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.taolc</groupId>
-    <artifactId>http</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>http-client-tool</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>http</name>
+    <name>http-client-tool</name>
     <description>httpclient Tool</description>
 
     <parent>
@@ -42,6 +42,13 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.5</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.47</version>
+        </dependency>
+
 
     </dependencies>
 
