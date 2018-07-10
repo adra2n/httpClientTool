@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.UnknownHostException;
@@ -86,9 +87,9 @@ public class HttpClientTool {
                 .build();
         poolingHttpClientConnectionManager.setDefaultConnectionConfig(connectionConfig);
         //连接池最大生成连接数
-        poolingHttpClientConnectionManager.setMaxTotal(2);
+        poolingHttpClientConnectionManager.setMaxTotal(1000);
         //默认设置route最大连接数
-        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(2);
+        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(1000);
 
         requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.DEFAULT)
@@ -96,11 +97,11 @@ public class HttpClientTool {
                 .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM,AuthSchemes.DIGEST))
                 .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
                 //httpclient使用连接池来管理连接，这个时间就是从连接池获取连接的超时时间
-                .setConnectionRequestTimeout(3000)
+                .setConnectionRequestTimeout(8000)
                 //连接建立后，数据传输过程中数据包之间间隔的最大时间
-                .setConnectTimeout(3000)
+                .setConnectTimeout(12000)
                 //连接建立时间，即三次握手完成时间
-                .setSocketTimeout(3000)
+                .setSocketTimeout(8000)
                 .build();
 
         //请求重试处理
@@ -174,16 +175,6 @@ public class HttpClientTool {
                 .build();
     }
 
-    public static void main(String[] args) {
-
-        for(int i=0;i<10;i++){
-            CloseableHttpClient closeableHttpClient1 = getHttpClient();
-            System.out.println(closeableHttpClient1);
-        }
-        String response = HttpClientTool.get("http://www.baidu.com");
-        logger.info(response);
-    }
-
     /**
      * http get
      * @param url
@@ -228,23 +219,23 @@ public class HttpClientTool {
         HttpEntity httpEntity = null;
         try {
             closeableHttpResponse = closeableHttpClient.execute(httpPost);
-            System.out.println(closeableHttpResponse.getStatusLine());
             httpEntity = closeableHttpResponse.getEntity();
             return EntityUtils.toString(httpEntity);
         } catch (IOException e) {
-            e.printStackTrace();
+            httpPost.abort();
+            logger.error("httpClient post 请求异常 -- {}",e.getMessage());
         } finally {
             try {
                 EntityUtils.consume(httpEntity);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("关闭 httpEntity 异常 -- {}",e.getMessage());
             }
             try {
                 if(closeableHttpResponse != null){
                     closeableHttpResponse.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("关闭 closeableHttpResponse 异常 -- {}",e.getMessage());
             }
         }
         return null;
