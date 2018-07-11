@@ -1,6 +1,7 @@
 package com.taolc.http;
 
 import org.apache.http.*;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.AuthSchemes;
@@ -42,6 +43,8 @@ public class HttpClientTool {
     private static Logger logger = LoggerFactory.getLogger(HttpClientTool.class);
 
     private static boolean isLogger = true;
+
+    private volatile static CloseableHttpClient instance = null;
 
     /**
      * 连接池管理
@@ -168,11 +171,20 @@ public class HttpClientTool {
      * @return
      */
     public static CloseableHttpClient getHttpClient(){
-        return HttpClients.custom()
-                .setConnectionManager(poolingHttpClientConnectionManager)
-                .setRetryHandler(httpRequestRetryHandler)
-                .setDefaultRequestConfig(requestConfig)
-                .build();
+        if(instance != null){
+            return instance;
+        }
+        synchronized (HttpClientTool.class){
+            if(instance != null){
+                return instance;
+            }
+            instance = HttpClients.custom()
+                    .setConnectionManager(poolingHttpClientConnectionManager)
+                    .setRetryHandler(httpRequestRetryHandler)
+                    .setDefaultRequestConfig(requestConfig)
+                    .build();
+            return instance;
+        }
     }
 
     /**
