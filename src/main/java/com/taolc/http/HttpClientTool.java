@@ -90,9 +90,9 @@ public class HttpClientTool {
                 .build();
         poolingHttpClientConnectionManager.setDefaultConnectionConfig(connectionConfig);
         //连接池最大生成连接数
-        poolingHttpClientConnectionManager.setMaxTotal(1000);
+        poolingHttpClientConnectionManager.setMaxTotal(20);
         //默认设置route最大连接数
-        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(1000);
+        poolingHttpClientConnectionManager.setDefaultMaxPerRoute(10);
 
         requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.DEFAULT)
@@ -100,11 +100,11 @@ public class HttpClientTool {
                 .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM,AuthSchemes.DIGEST))
                 .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
                 //httpclient使用连接池来管理连接，这个时间就是从连接池获取连接的超时时间
-                .setConnectionRequestTimeout(8000)
+                .setConnectionRequestTimeout(3000)
                 //连接建立后，数据传输过程中数据包之间间隔的最大时间
-                .setConnectTimeout(12000)
+                .setConnectTimeout(3000)
                 //连接建立时间，即三次握手完成时间
-                .setSocketTimeout(8000)
+                .setSocketTimeout(3000)
                 .build();
 
         //请求重试处理
@@ -231,6 +231,9 @@ public class HttpClientTool {
         HttpEntity httpEntity = null;
         try {
             closeableHttpResponse = closeableHttpClient.execute(httpPost);
+            if(isLogger){
+                logger.info("{} --> {}",url,closeableHttpResponse.getStatusLine());
+            }
             httpEntity = closeableHttpResponse.getEntity();
             return EntityUtils.toString(httpEntity);
         } catch (IOException e) {
