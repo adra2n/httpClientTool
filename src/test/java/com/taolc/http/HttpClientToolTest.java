@@ -21,7 +21,7 @@ public class HttpClientToolTest {
 
     public static void post(){
         ExecutorService pool = Executors.newFixedThreadPool(5);
-        for(int i=0;i<10;i++){
+        for(int i=0;i<100;i++){
             pool.submit(new PostThread(host,port));
         }
         pool.shutdown();
