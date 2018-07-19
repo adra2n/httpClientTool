@@ -389,6 +389,11 @@ public class HttpClientTool {
                     logger.info("http 请求url {} --> 响应码[{}]", httpMethod.getURI(), httpResponse.getStatusLine().getStatusCode());
                 }
                 if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
+                    if(DEBUG){
+                        String content = EntityUtils.toString(httpResponse.getEntity(),ENCODING);
+                        logger.info("响应内容 --> {}",content);
+                        return content;
+                    }
                     return EntityUtils.toString(httpResponse.getEntity(),ENCODING);
                 }else{
                     if(httpResponse.getEntity() != null){

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class HttpClientToolTest {
 
@@ -26,7 +25,7 @@ public class HttpClientToolTest {
                 HttpClientTool.get("http://localhost:8080/http/get",map);
 
                 HttpClientTool.post("http://localhost:8080/http/post",map);
-                HttpClientTool.postJson("http://localhost:8080/http/post",JSONArray.toJSONString(map));
+                HttpClientTool.postJson("http://localhost:8080/http/postJson",JSONArray.toJSONString(map));
             });
         }
         pool.shutdown();
