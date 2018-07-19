@@ -1,29 +1,29 @@
 package com.taolc.http.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.taolc.http.enums.ResponseEnum;
+import com.taolc.http.model.User;
 import com.taolc.http.vo.ResponseData;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/http")
 public class HttpController {
 
-    @ResponseBody
-    @RequestMapping(value = "/get",method = RequestMethod.GET)
-    public ResponseData get(){
+    @GetMapping(value = "/get")
+    public ResponseData get(User user) {
         ResponseData responseData = new ResponseData(ResponseEnum.OK);
-        responseData.setData("this is get http");
+        responseData.setData(user);
+        System.out.println(JSONArray.toJSONString(responseData));
         return responseData;
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/post",method = RequestMethod.POST)
-    public ResponseData post(){
+    @PostMapping(value = "/post")
+    public ResponseData post(@RequestBody User user) {
         ResponseData responseData = new ResponseData(ResponseEnum.OK);
-        responseData.setData("this is post http");
+        responseData.setData(user);
+        System.out.println(JSONArray.toJSONString(responseData));
         return responseData;
     }
 }

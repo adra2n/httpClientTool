@@ -1,46 +1,34 @@
 package com.taolc.http;
 
+import com.alibaba.fastjson.JSONArray;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class HttpClientToolTest {
 
-    private static String host = "localhost";
-    private static int port = 8080;
-
     public static void main(String[] args) {
-//        get();
         post();
     }
 
-    public static void get(){
-        String url = "http://"+host+":"+port+"/http/get";
-        String response = HttpClientTool.get(url);
-        System.out.println(response);
-    }
-
     public static void post(){
-        ExecutorService pool = Executors.newFixedThreadPool(5);
-        for(int i=0;i<100;i++){
-            pool.submit(new PostThread(host,port));
+        ExecutorService pool = Executors.newFixedThreadPool(20);
+        for(int i=0;i<1;i++){
+            pool.submit(() -> {
+                HttpClientTool.get("http://localhost:8080/http/get?name=taolc");
+                Map<String, String> map = new HashMap<>();
+                map.put("name","taolc");
+                map.put("sex","男");
+                map.put("age","28");
+                HttpClientTool.get("http://localhost:8080/http/get",map);
+
+                HttpClientTool.post("http://localhost:8080/http/post",map);
+                HttpClientTool.postJson("http://localhost:8080/http/post",JSONArray.toJSONString(map));
+            });
         }
         pool.shutdown();
-    }
-}
-
-class PostThread implements Runnable{
-    private String host;
-    private int port;
-
-    PostThread(String host,int port){
-        this.host = host;
-        this.port = port;
-    }
-
-    @Override
-    public void run() {
-        String url = "http://"+host+":"+port+"/http/post";
-        String response = HttpClientTool.post(url);
-        System.out.println(response);
     }
 }
