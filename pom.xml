@@ -43,12 +43,18 @@
             <version>4.5.5</version>
         </dependency>
 
+        <!-- json转化 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.47</version>
         </dependency>
 
+        <!-- spring 监控 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
     </dependencies>
 
