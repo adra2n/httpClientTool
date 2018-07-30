@@ -24,7 +24,7 @@ public class CommentTest {
                 String[] array = line.split("</p>");
                 Arrays.stream(array).forEach(item -> {
                     //只保留中文和字符
-                    String reg = "[^\u4e00-\u9fa5|\\，||！||？||。]";
+                    String reg = "[^\u4e00-\u9fa5|\\，||！||？||。||：]";
                     item = item.replaceAll(reg, "");
                     if(!StringUtils.isEmpty(item)){
 //                        System.out.println(item);
