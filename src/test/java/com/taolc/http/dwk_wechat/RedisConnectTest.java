@@ -8,8 +8,8 @@ import com.taolc.http.HttpClientTool;
 public class RedisConnectTest {
 
     public static void main(String[] args) {
-        devConnectTest();
-//        testConnectTest();
+//        devConnectTest();
+        testConnectTest();
 //        prodQQConnectTest();
 //        prodWechatConnectTest();
     }
