@@ -21,7 +21,7 @@ public class CustomMenuCreate {
      * QQ 自定义菜单
      */
     public static void qqMemu(){
-        String qqAccessTokenUrl = "http://api.qquser.mur.qq.com/adminext/getAccessToken.do";
+        String qqAccessTokenUrl = "http://test.qquser.mur.qq.com/adminext/getAccessToken.do";
         String qq_access_token = HttpClientTool.post(qqAccessTokenUrl);
         JSONObject jsonObject = JSONObject.parseObject(qq_access_token);
         String access_token = (String) jsonObject.get("json");
@@ -61,7 +61,7 @@ public class CustomMenuCreate {
      * QQ 自定义菜单
      */
     public static void wechatMemu(){
-        String qqAccessTokenUrl = "http://api.user.mur.qq.com/adminext/getAccessToken.do";
+        String qqAccessTokenUrl = "http://test.qquser.mur.qq.com/adminext/getAccessToken.do";
         String qq_access_token = HttpClientTool.post(qqAccessTokenUrl);
         JSONObject jsonObject = JSONObject.parseObject(qq_access_token);
         String access_token = (String) jsonObject.get("json");
