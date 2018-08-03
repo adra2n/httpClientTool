@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CommentTest {
 
@@ -41,5 +43,24 @@ public class CommentTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void writeRandom(){
+        int length = 1;
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+        for(int i=0;i<length;i++){
+            pool.submit(()->{
+                Map<String,String> headers = new HashMap<>();
+                headers.put("Cookie","JSESSIONID=40972C64E9A38DB1457ECD1CD850D7C2");
+
+                String json = "{\"reviewContent\":\""+"aa"+"\",\"topicId\":\"HT10079\"," +
+                        "\"imageUrl\":\"\"," +
+                        "\"ob-token\":\"\\\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50SWQiOjIwMDAzMjUsImFjY291bnROYW1lIjoi6qeB4Ly6IOC8u-qngiIsImFjY291bnRUeXBlIjoiVVNFUiIsImV4cCI6MTUzMzAyNjgzMCwiaWF0IjoxNTMyOTQwNDMwfQ.Ds0JLdTkaJboex6TgHCgVdyq1BmxoDb1-75YQO76qIc\\\"\"}";
+                String url = "http://test.qquser.mur.qq.com/mobile/topic/v2/writecomments";
+                String response = HttpClientTool.postJson(url,headers,json);
+                System.out.println(response);
+            });
+        }
+        pool.shutdown();
     }
 }
