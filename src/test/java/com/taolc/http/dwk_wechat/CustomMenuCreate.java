@@ -13,8 +13,9 @@ public class CustomMenuCreate {
     private static final Logger logger = LoggerFactory.getLogger(CustomMenuCreate.class);
 
     public static void main(String[] args) {
-        qqMemu();
+//        qqMemu();
 //        wechatMemu();
+        getCustomMenu();
     }
 
     /**
@@ -93,6 +94,23 @@ public class CustomMenuCreate {
         response = HttpClientTool.postJson(createUrl,json);
         logger.info("创建自定义菜单 --> {}",response);
 
+        String getUrl = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token="+access_token;
+        String getResponse = HttpClientTool.get(getUrl);
+        logger.info("获取自定义菜单的json数据 --> {}",getResponse);
+    }
+
+    /**
+     * 获取自定义菜单
+     */
+    public static void getCustomMenu(){
+        String qqAccessTokenUrl = "http://test.qquser.mur.qq.com/adminext/getAccessToken.do";
+        String qq_access_token = HttpClientTool.post(qqAccessTokenUrl);
+        JSONObject jsonObject = JSONObject.parseObject(qq_access_token);
+        String access_token = (String) jsonObject.get("json");
+        logger.info("获取到wechat的accessToken为 --> {}",access_token);
+        if(StringUtils.isEmpty(access_token)){
+            return;
+        }
         String getUrl = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token="+access_token;
         String getResponse = HttpClientTool.get(getUrl);
         logger.info("获取自定义菜单的json数据 --> {}",getResponse);
