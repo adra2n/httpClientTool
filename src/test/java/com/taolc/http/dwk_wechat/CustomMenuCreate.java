@@ -14,8 +14,8 @@ public class CustomMenuCreate {
 
     public static void main(String[] args) {
 //        qqMemu();
-//        wechatMemu();
-        getCustomMenu();
+        wechatMemu();
+//        getCustomMenu();
     }
 
     /**
@@ -59,7 +59,7 @@ public class CustomMenuCreate {
     }
 
     /**
-     * QQ 自定义菜单
+     * wechat 自定义菜单
      */
     public static void wechatMemu(){
         String qqAccessTokenUrl = "http://test.qquser.mur.qq.com/adminext/getAccessToken.do";
@@ -82,6 +82,7 @@ public class CustomMenuCreate {
         }
 
         String createUrl = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+access_token;
+
         String json = "{\"button\":[{\"name\":\"走近游戏\",\"sub_button\":[" +
                 "{\"name\":\"新品体验\",\"type\":\"view\",\"url\":\"http:\\/\\/api.user.mur.qq.com\\/App\\/www\\/#\\/home\"}" +
                 ",{\"name\":\"兴趣交流\",\"type\":\"view\",\"url\":\"http:\\/\\/buluo.qq.com\\/mobile\\/barindex.html?_bid=128&_wv=1027&bid=342763\"}" +
@@ -91,6 +92,8 @@ public class CustomMenuCreate {
                 ",{\"name\":\"奖品兑换\",\"type\":\"view\",\"url\":\"http:\\/\\/api.user.mur.qq.com\\/App\\/www\\/#\\/productList\"}" +
                 ",{\"name\":\"推荐好友\",\"type\":\"view\",\"url\":\"http:\\/\\/api.user.mur.qq.com\\/App\\/www\\/#\\/invertFriends\"}" +
                 ",{\"name\":\"个人中心\",\"type\":\"view\",\"url\":\"http:\\/\\/api.user.mur.qq.com\\/App\\/www\\/#\\/me\"}]}]}";
+
+        json = "{\"menu\":{\"button\":[{\"name\":\"走近游戏\",\"sub_button\":[{\"type\":\"view\",\"name\":\"新品体验\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/home\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"游戏资讯\",\"url\":\"http:\\/\\/mp.weixin.qq.com\\/mp\\/homepage?__biz=MzAwMjc0NDM1Mw==&hid=1&sn=2f296b19e16630b1d3af258c6c1394fb&scene=18#wechat_redirect\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"兴趣交流\",\"url\":\"http:\\/\\/buluo.qq.com\\/mobile\\/barindex.html?_bid=128&_wv=1027&bid=342763\",\"sub_button\":[]}]},{\"name\":\"参与研究\",\"sub_button\":[{\"type\":\"view\",\"name\":\"话题讨论\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/topic/api\\/auth\\/openid\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"开放研究\",\"url\":\"https:\\/\\/open.weixin.qq.com\\/connect\\/oauth2\\/authorize?appid=wxd4763840aea5111a&redirect_uri=http%3a%2f%2ftest.qquser.mur.qq.com%2fApp%2fwww%2findex.html%23%2ftransition&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect\",\"sub_button\":[]}]},{\"name\":\"领取奖励\",\"sub_button\":[{\"type\":\"view\",\"name\":\"玩咖认证\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/user\\/cert\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"奖品兑换\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/productList\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"推荐好友\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/invertFriends\",\"sub_button\":[]},{\"type\":\"view\",\"name\":\"个人中心\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/me\",\"sub_button\":[]}]}]}}";
         response = HttpClientTool.postJson(createUrl,json);
         logger.info("创建自定义菜单 --> {}",response);
 
