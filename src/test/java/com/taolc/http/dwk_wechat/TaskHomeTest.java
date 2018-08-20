@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 public class TaskHomeTest {
     public static void main(String[] args) {
         ExecutorService pool = Executors.newFixedThreadPool(100);
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10; i++) {
             pool.submit(() -> {
                 String url = "http://test.qquser.mur.qq.com/tasks/home";
                 String response = HttpClientTool.get(url);
