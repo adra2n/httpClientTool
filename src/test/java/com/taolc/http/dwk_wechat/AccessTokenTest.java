@@ -16,7 +16,7 @@ public class AccessTokenTest {
         int index = 1;
         for(int i=0;i<30;i++){
             pool.submit(() -> {
-                String url = "http://localhost:8080/adminext/getAccessToken.do";
+                String url = "http://test.qquser.mur.qq.com/adminext/getAccessToken.do";
                 String response = HttpClientTool.post(url);
                 logger.info(response);
             });
