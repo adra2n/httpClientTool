@@ -48,7 +48,7 @@ public class HttpClientTool {
     private static Logger logger = LoggerFactory.getLogger(HttpClientTool.class);
 
     //是否打印日志
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = true;
     //连接池最大连接数
     private static int MAX_TOTAL = 20;
     //route最大连接数
