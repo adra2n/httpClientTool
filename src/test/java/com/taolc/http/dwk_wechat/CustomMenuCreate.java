@@ -14,8 +14,8 @@ public class CustomMenuCreate {
 
     public static void main(String[] args) {
 //        qqMemu();
-//        wechatMemu();
-        getCustomMenu();
+        wechatMemu();
+//        getCustomMenu();
     }
 
     /**
@@ -107,13 +107,13 @@ public class CustomMenuCreate {
         String json;
         if("wechat".equals(type)){
             json = "{\"button\":[{\"name\":\"走近游戏\",\"sub_button\":[" +
-                    "{\"name\":\"新品体验\",\"type\":\"view\",\"url\":\"http:\\/\\/api.qquser.mur.qq.com\\/App\\/www\\/#\\/home\"}" +
+                    "{\"name\":\"新品体验\",\"type\":\"view\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/home\"}" +
                     ",{\"name\":\"兴趣交流\",\"type\":\"view\",\"url\":\"http:\\/\\/buluo.qq.com\\/mobile\\/barindex.html?_bid=128&_wv=1027&bid=342763\"}" +
-                    "]},{\"name\":\"参与研究\",\"type\":\"view\",\"url\":\"https:\\/\\/open.mp.qq.com\\/connect\\/oauth2\\/authorize?appid=200912033&redirect_uri=http%3a%2f%2fapi.qquser.mur.qq.com%2fApp%2fwww%2findex.html%23%2ftransition&response_type=code&scope=snsapi_base&state=STATE#qq_redirect\"}" +
-                    ",{\"name\":\"领取奖励\",\"sub_button\":[{\"name\":\"玩咖认证\",\"type\":\"view\",\"url\":\"http:\\/\\/api.qquser.mur.qq.com\\/App\\/www\\/#\\/user\\/cert\"}" +
-                    ",{\"name\":\"奖品兑换\",\"type\":\"view\",\"url\":\"http:\\/\\/api.qquser.mur.qq.com\\/App\\/www\\/#\\/productList\"}" +
-                    ",{\"name\":\"推荐好友\",\"type\":\"view\",\"url\":\"http:\\/\\/api.qquser.mur.qq.com\\/App\\/www\\/#\\/invertFriends\"}" +
-                    ",{\"name\":\"个人中心\",\"type\":\"view\",\"url\":\"http:\\/\\/api.qquser.mur.qq.com\\/App\\/www\\/#\\/me\"}]}]}";
+                    "]},{\"name\":\"参与研究\",\"type\":\"view\",\"url\":\"https:\\/\\/open.weixin.qq.com\\/connect\\/oauth2\\/authorize?appid=wxd4763840aea5111a&redirect_uri=http%3a%2f%2ftest.qquser.mur.qq.com%2fApp%2fwww%2findex.html%23%2ftransition&response_type=code&scope=snsapi_base&state=STATE#qq_redirect\"}" +
+                    ",{\"name\":\"领取奖励\",\"sub_button\":[{\"name\":\"玩咖认证\",\"type\":\"view\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/user\\/cert\"}" +
+                    ",{\"name\":\"奖品兑换\",\"type\":\"view\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/productList\"}" +
+                    ",{\"name\":\"推荐好友\",\"type\":\"view\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/invertFriends\"}" +
+                    ",{\"name\":\"个人中心\",\"type\":\"view\",\"url\":\"http:\\/\\/test.qquser.mur.qq.com\\/App\\/www\\/#\\/me\"}]}]}";
         }else if("qq".equals(type)){
             json = "{\"button\":[{\"name\":\"走近游戏\",\"sub_button\":[" +
                     "{\"name\":\"新品体验\",\"type\":\"view\",\"url\":\"http:\\/\\/api.user.mur.qq.com\\/App\\/www\\/#\\/home\"}" +
