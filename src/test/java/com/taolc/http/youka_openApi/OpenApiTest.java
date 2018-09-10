@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.taolc.http.HttpClientTool;
 import com.taolc.http.util.GenerateCodeUtil;
 import com.taolc.http.util.JWTUtil;
+import com.taolc.util.DateUtil;
 import tdh.platform.utruck.openapi.DC;
 import tdh.platform.utruck.openapi.entity.ApiRequest;
 import tdh.platform.utruck.openapi.entity.ApiSubject;
@@ -14,30 +15,39 @@ import tdh.platform.utruck.openapi.service.common.user.entity.request.CrtShipper
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 优卡 openApi测试
  */
 public class OpenApiTest {
-
-    private String shipper = "18225696106";
-    private String driver = "15210770876";
-    private boolean isShipper;
-
     public static void main(String[] args) {
-        //两个流程
-        // 一种 自动接单 - 装车 - 发车 - 到达 - 卸货 - 签收
-        // 二种 指派司机 - 装车 - 发车 - 到达 - 卸货 - 确认到达 - 签收
         OpenApiTest me = me();
-//        me.registerShipper();
-//        me.registerDriver();
-//        me.create();
-        me.orderDetail();
-//        me.loadTruck();
-//         me.startTruck();
-//        me.arriveTruck();
-//        me.unloadTruck();
-//        me.receiving();
+        me.flowA();
+    }
+
+    /**
+     * A 流程 注册货主 - 注册司机 - 创建订单（自动接单）  - 装车 - 发车 - 到达 - 卸货 - 签收 - 订单查询
+     */
+    private void flowA(){
+        String shipper = GenerateCodeUtil.generatePhone();
+        String driver = GenerateCodeUtil.generatePhone();
+        String orderNo = "DD" + System.currentTimeMillis();
+        registerShipper(shipper);
+        registerDriver(driver);
+        create(shipper,driver,orderNo);
+        loadTruck(driver,orderNo);
+//        startTruck();
+//        arriveTruck();
+//        unloadTruck();
+//        receiving();
+//        orderDetail();
+    }
+
+    /**
+     * B 流程 注册货主- 注册司机 - 创建订单 - 指派司机 - 装车 - 发车 - 到达 - 卸货 - 确认到达 - 签收 - 订单查询
+     */
+    private void flowB(){
     }
 
     public static OpenApiTest me(){
@@ -45,12 +55,20 @@ public class OpenApiTest {
     }
 
     /**
-     * 创建优卡订单
+     * 指派司机
      */
-    public void create(){
+    private void assignDriverOrder(String shipperMobile,String driverMobile,String orderNo){
+        UtAssignOrderReqVo utAssignOrderReqVo = new UtAssignOrderReqVo();
+        utAssignOrderReqVo.setSourceOrderNo(orderNo);
+        utAssignOrderReqVo.setCarrierMobile(driverMobile);
+        utAssignOrderReqVo.setCharge(new BigDecimal("1111.11"));
+        basePostJson(utAssignOrderReqVo,"utOrderOpenService/assignDriverOrder",shipperMobile);
+    }
 
-        isShipper = true;
-
+    /**
+     * 创建优卡订单(不包含司机信息)
+     */
+    private void createNoDriver(String shipperMobile,String orderNo){
         UtruckOrderBody utruckOrderBody = new UtruckOrderBody();
 
         List<UtOrderContact> utOrderContacts = new ArrayList<>();
@@ -83,36 +101,74 @@ public class OpenApiTest {
         utruckOrderBody.setCargo(utOrderCargo);
         utruckOrderBody.setExpectDeliverTime(new Date());
         utruckOrderBody.setExpectArriveTime(new Date());
-        utruckOrderBody.setSourceOrderNo("DD002");
+        utruckOrderBody.setSourceOrderNo(orderNo);
+        basePostJson(utruckOrderBody,"utOrderOpenService/create",shipperMobile);
+    }
+
+    /**
+     * 创建优卡订单 (包含司机)
+     */
+    public void create(String shipperMobile,String driverMobile,String orderNo){
+        UtruckOrderBody utruckOrderBody = new UtruckOrderBody();
+
+        List<UtOrderContact> utOrderContacts = new ArrayList<>();
+        UtOrderContact utOrderContact = new UtOrderContact();
+        utOrderContact.setName("张三");
+        utOrderContact.setMobile(GenerateCodeUtil.generatePhone());
+        utOrderContact.setAddress("上海市");
+        utOrderContact.setCity(310000);
+        utOrderContact.setContactClass(DC.CargoRole.SEND);
+        utOrderContacts.add(utOrderContact);
+
+        utOrderContact = new UtOrderContact();
+        utOrderContact.setName("李四");
+        utOrderContact.setMobile(GenerateCodeUtil.generatePhone());
+        utOrderContact.setAddress("上海市");
+        utOrderContact.setCity(310000);
+        utOrderContact.setContactClass(DC.CargoRole.RECE);
+        utOrderContacts.add(utOrderContact);
+
+        UtOrderCargo utOrderCargo = new UtOrderCargo();
+        utOrderCargo.setWeight(100F);
+        utOrderCargo.setVolumn(10F);
+        utOrderCargo.setTruckType(DC.UtTruckType.DL);
+        utOrderCargo.setTruckLength(DC.UtTruckSize.L420);
+        utOrderCargo.setCargoName("机器人");
+        utOrderCargo.setCargoTypeCd(DC.UtCargoType.DZCP);
+
+
+        utruckOrderBody.setContactList(utOrderContacts);
+        utruckOrderBody.setCargo(utOrderCargo);
+        utruckOrderBody.setExpectDeliverTime(new Date());
+        utruckOrderBody.setExpectArriveTime(DateUtil.addDays(1));
+        utruckOrderBody.setSourceOrderNo(orderNo);
         utruckOrderBody.setCarrierTypeCd(DC.UtCarrierType.S);
-        utruckOrderBody.setCarrierMobile(driver);
-        utruckOrderBody.setTotalCharge(new BigDecimal(1111.11));
-        basePostJson(utruckOrderBody,"utOrderOpenService/create");
+        utruckOrderBody.setCarrierMobile(driverMobile);
+        utruckOrderBody.setDriverMobile(driverMobile);
+        utruckOrderBody.setTotalCharge(new BigDecimal(1111));
+        basePostJson(utruckOrderBody,"utOrderOpenService/create",shipperMobile);
     }
 
     /**
      * 订单查询
      */
-    public void orderDetail(){
-        isShipper = true;
-
+    public void orderDetail(String shipperMobile,String orderNo){
         UtOrderDetailRequest utOrderDetailRequest = new UtOrderDetailRequest();
-        utOrderDetailRequest.setSourceOrderNo("DD001");
-        basePostJson(utOrderDetailRequest,"utOrderOpenService/detail");
+        utOrderDetailRequest.setSourceOrderNo(orderNo);
+        basePostJson(utOrderDetailRequest,"utOrderOpenService/detail",shipperMobile);
     }
 
     /**
      * 装车测试
      */
-    public void loadTruck(){
-        basePostJson(getUtPickOrderReqVo(),"utOrderOpenService/loadTruck");
+    public void loadTruck(String driverMobile,String orderNo){
+        basePostJson(getUtPickOrderReqVo(orderNo),"utOrderOpenService/loadTruck",driverMobile);
     }
 
-    private UtPickOrderReqVo getUtPickOrderReqVo(){
-        isShipper = false;
+    private UtPickOrderReqVo getUtPickOrderReqVo(String orderNo){
         UtPickOrderReqVo utPickOrderReqVo = new UtPickOrderReqVo();
         utPickOrderReqVo.setRemark("1111");
-        utPickOrderReqVo.setSourceOrderNo("DD001");
+        utPickOrderReqVo.setSourceOrderNo(orderNo);
         List<UtOrderFileInfo> utOrderFileInfos = new ArrayList<>();
         UtOrderFileInfo utOrderFileInfo = new UtOrderFileInfo();
         utOrderFileInfo.setFileName("111");
@@ -124,38 +180,42 @@ public class OpenApiTest {
     /**
      * 发车测试
      */
-    public void startTruck(){
-        basePostJson(getUtPickOrderReqVo(),"utOrderOpenService/startTruck");
+    public void startTruck(String driverMobile,String orderNo){
+        basePostJson(getUtPickOrderReqVo(orderNo),"utOrderOpenService/startTruck",driverMobile);
     }
 
     /**
      * 到达测试
      */
-    public void arriveTruck(){
-        basePostJson(getUtPickOrderReqVo(),"utOrderOpenService/arriveTruck");
+    public void arriveTruck(String driverMobile,String orderNo){
+        basePostJson(getUtPickOrderReqVo(orderNo),"utOrderOpenService/arriveTruck",driverMobile);
     }
 
     /**
      * 卸货测试
      */
-    public void unloadTruck(){
-        basePostJson(getUtPickOrderReqVo(),"utOrderOpenService/unloadTruck");
+    public void unloadTruck(String driverMobile,String orderNo){
+        try {
+            TimeUnit.MINUTES.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        basePostJson(getUtPickOrderReqVo(orderNo),"utOrderOpenService/unloadTruck",driverMobile);
     }
 
     /**
      * 签收测试
      */
-    public void receiving(){
-        basePostJson(getUtPickOrderReqVo(),"utOrderOpenService/receiving");
+    public void receiving(String driverMobile,String orderNo){
+        basePostJson(getUtPickOrderReqVo(orderNo),"utOrderOpenService/receiving",driverMobile);
     }
 
     /**
      * 注册货主
      */
-    public void registerShipper(){
-        isShipper = true;
+    public void registerShipper(String mobile){
         CrtShipperRequset crtShipperRequset = new CrtShipperRequset();
-        crtShipperRequset.setMobile(GenerateCodeUtil.generatePhone());
+        crtShipperRequset.setMobile(mobile);
         crtShipperRequset.setCompanyName("百及");
         crtShipperRequset.setFixedTel("");
         crtShipperRequset.setUsername("taolc");
@@ -163,25 +223,33 @@ public class OpenApiTest {
         List<UtOrderFileInfo> utOrderFileInfos = new ArrayList<>();
         UtOrderFileInfo utOrderFileInfo = new UtOrderFileInfo();
         utOrderFileInfo.setFileName("111");
-        utOrderFileInfo.setUrl("2222");
+        utOrderFileInfo.setUrl("http://taolc.vicp.cc/images/20180829/original/03494af8c9b541e8b5240aca09621e55.jpg");
+        utOrderFileInfo.setRefType(DC.FileType.P10);
         utOrderFileInfos.add(utOrderFileInfo);
         crtShipperRequset.setImages(utOrderFileInfos);
-        basePostJson(crtShipperRequset,"utUserOpenService/registerShipper");
+        basePostJson(crtShipperRequset,"utUserOpenService/registerShipper",null);
     }
 
     /**
      * 注册司机
      */
-    public void registerDriver(){
-        isShipper = true;
+    public void registerDriver(String mobile){
         CrtDriverRequest crtDriverRequest = new CrtDriverRequest();
-        crtDriverRequest.setMobile(GenerateCodeUtil.generatePhone());
+        crtDriverRequest.setMobile(mobile);
         crtDriverRequest.setUsername("taolc");
-        crtDriverRequest.setVehicleLength("12.22");
-        crtDriverRequest.setVehicleModel("s1122");
-        crtDriverRequest.setVehiclePlateNo("沪C66666");
+        crtDriverRequest.setVehicleLength("12");
+        crtDriverRequest.setVehicleModel("10");
+        crtDriverRequest.setVehiclePlateNo("京A11111");
         crtDriverRequest.setVehicleLoad(20);
-        basePostJson(crtDriverRequest,"utUserOpenService/registerDriver");
+
+        List<UtOrderFileInfo> utOrderFileInfos = new ArrayList<>();
+        UtOrderFileInfo utOrderFileInfo = new UtOrderFileInfo();
+        utOrderFileInfo.setFileName("2222");
+        utOrderFileInfo.setUrl("http://taolc.vicp.cc/images/20180829/original/03494af8c9b541e8b5240aca09621e55.jpg");
+        utOrderFileInfo.setRefType(DC.FileType.P60);
+        utOrderFileInfos.add(utOrderFileInfo);
+        crtDriverRequest.setImages(utOrderFileInfos);
+        basePostJson(crtDriverRequest,"utUserOpenService/registerDriver",null);
     }
 
     /**
@@ -189,16 +257,12 @@ public class OpenApiTest {
      * @param t
      * @param methodName
      */
-    private <T> void basePostJson(T t,String methodName){
+    private <T> void basePostJson(T t,String methodName,String mobile){
         ApiRequest<T> request = new ApiRequest<>();
         request.setBody(t);
         request.setOperaTime(new Date());
         ApiSubject apiSubject = new ApiSubject();
-        if(isShipper){
-            apiSubject.setUserMobile(shipper);
-        }else{
-            apiSubject.setUserMobile(driver);
-        }
+        apiSubject.setUserMobile(mobile);
         request.setSubject(apiSubject);
         System.out.println("请求参数 --> " + JSONArray.toJSONString(request));
 

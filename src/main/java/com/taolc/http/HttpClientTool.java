@@ -11,7 +11,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.*;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -47,8 +46,18 @@ public class HttpClientTool {
 
     private static Logger logger = LoggerFactory.getLogger(HttpClientTool.class);
 
+    /**
+     * 在项目中，下面的配置写到配置文件中，并根据项目的实际情况 做相应调整
+     * 引用的maven版本为
+     <dependency>
+     <groupId>org.apache.httpcomponents</groupId>
+     <artifactId>httpclient</artifactId>
+     <version>4.5.5</version>
+     </dependency>
+     */
+
     //是否打印日志
-    private static boolean DEBUG = true;
+    private static boolean isPrint = true;
     //连接池最大连接数
     private static int MAX_TOTAL = 20;
     //route最大连接数
@@ -134,43 +143,43 @@ public class HttpClientTool {
         //请求重试处理
         httpRequestRetryHandler = (exception, executionCount, context) -> {
             if (executionCount >= RETRYP_HTTP_COUNT) {// 如果已经重试了n次，就放弃
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("已经重试了{}次，放弃重试", executionCount - 1);
                 }
                 return false;
             }
             if (exception instanceof NoHttpResponseException) {// 如果服务器丢掉了连接，那么就重试
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("服务器丢掉了连接，重试请求");
                 }
                 return true;
             }
             if (exception instanceof SSLHandshakeException) {// 不要重试SSL握手异常
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("SSL握手异常，放弃重试");
                 }
                 return false;
             }
             if (exception instanceof InterruptedIOException) {// 超时
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("超时异常，放弃重试");
                 }
                 return false;
             }
             if (exception instanceof UnknownHostException) {// 目标服务器不可达
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("目标服务器不可达，放弃重试");
                 }
                 return false;
             }
             if (exception instanceof ConnectTimeoutException) {// 连接被拒绝
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("连接被拒绝，放弃重试");
                 }
                 return false;
             }
             if (exception instanceof SSLException) {// ssl异常
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("ssl异常，放弃重试");
                 }
                 return false;
@@ -180,7 +189,7 @@ public class HttpClientTool {
             HttpRequest request = clientContext.getRequest();
             // 如果请求是幂等的，就再次尝试
             if (!(request instanceof HttpEntityEnclosingRequest)) {
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("当前请求是幂等，重试请求");
                 }
                 return true;
@@ -385,11 +394,11 @@ public class HttpClientTool {
             httpResponse = httpClient.execute(httpMethod);
             //获取返回结果
             if (httpResponse != null) {
-                if (DEBUG) {
+                if (isPrint) {
                     logger.info("http 请求url {} --> 响应码[{}]", httpMethod.getURI(), httpResponse.getStatusLine().getStatusCode());
                 }
                 if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-                    if(DEBUG){
+                    if(isPrint){
                         String content = EntityUtils.toString(httpResponse.getEntity(),ENCODING);
                         logger.info("响应内容 --> {}",content);
                         return content;
@@ -397,7 +406,7 @@ public class HttpClientTool {
                     return EntityUtils.toString(httpResponse.getEntity(),ENCODING);
                 }else{
                     if(httpResponse.getEntity() != null){
-                        if(DEBUG){
+                        if(isPrint){
                             logger.info("响应内容 --> {}",EntityUtils.toString(httpResponse.getEntity(),ENCODING));
                         }
                     }
